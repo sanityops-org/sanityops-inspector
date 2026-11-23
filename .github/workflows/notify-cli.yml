@@ -17,8 +17,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.CLI_SYNC_TOKEN }}
         run: |
-          curl -X POST \
+          # --fail-with-body: a rejected dispatch (403/404) fails this step and
+          # prints the API error instead of exiting 0 and hiding it.
+          curl --fail-with-body --silent --show-error \
+            -X POST \
             -H "Accept: application/vnd.github+json" \
+            -H "Content-Type: application/json" \
             -H "Authorization: Bearer $GH_TOKEN" \
             https://api.github.com/repos/sanityops-org/sanityops-cli/dispatches \
             -d '{"event_type":"skill-updated","client_payload":{"commit":"${{ github.sha }}","ref":"${{ github.ref }}"}}'
